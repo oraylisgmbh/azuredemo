@@ -86,7 +86,7 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
     "userImageName": "[concat('http://',parameters('userImageStorageAccountName'),'.blob.core.windows.net/',parameters('userImageStorageContainerName'),'/',parameters('userImageVhdName'))]",
-    "osDiskVhdName": "[concat('http://',parameters('userImageStorageAccountNameTarget'),'.blob.core.windows.net/',parameters('userImageStorageContainerNameTarget'),'/',parameters('userImageVhdNameTarget'),'_osDisk.vhd')]"
+    "osDiskVhdName": "[concat('http://',parameters('userImageStorageAccountNameTarget'),'.blob.core.windows.net/',parameters('userImageStorageContainerNameTarget'),'/',parameters('userImageVhdNameTarget'),'-osDisk.vhd')]"
   },
   "resources": [
     {
@@ -167,7 +167,7 @@
         },
         "storageProfile": {
           "osDisk": {
-            "name": "[concat(variables('vmName'),'_osDisk')]",
+            "name": "[concat(variables('vmName'),'-osDisk')]",
             "osType": "[parameters('osType')]",
             "caching": "ReadWrite",
             "createOption": "FromImage",
