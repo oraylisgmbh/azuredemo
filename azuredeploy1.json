@@ -51,7 +51,6 @@
   },
   "variables": {
     "location": "West US",
-    "publicIPAddressName": "myPublicIP",
     "vmName": "myVM",
     "virtualNetworkName": "myVNET",
     "nicName": "myVMNic",
