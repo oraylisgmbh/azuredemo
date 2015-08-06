@@ -8,34 +8,16 @@
         "description": "This is the name of the your storage account"
       }
     },
-	"userImageStorageAccountNameTarget": {
-      "type": "string",
-      "metadata": {
-        "description": "This is the name of the target storage account"
-      }
-    },
     "userImageStorageContainerName": {
       "type": "string",
       "metadata": {
         "description": "This is the name of the container in your storage account"
       }
     },
-	"userImageStorageContainerNameTarget": {
-      "type": "string",
-      "metadata": {
-        "description": "This is the name of the target container in your target storage account"
-      }
-    },
     "userImageVhdName": {
       "type": "string",
       "metadata": {
         "description": "This is the name of the your customized VHD"
-      }
-    },
-	"userImageVhdNameTarget": {
-      "type": "string",
-      "metadata": {
-        "description": "This is the name of the target VHD"
       }
     },
     "dnsNameForPublicIP": {
@@ -76,7 +58,7 @@
   "variables": {
     "location": "West US",
     "publicIPAddressName": "myPublicIP",
-    "vmName": "parameters('userImageVhdNameTarget')",
+    "vmName": "myVM",
     "virtualNetworkName": "myVNET",
     "nicName": "myVMNic",
     "addressPrefix": "10.0.0.0/16",
@@ -86,7 +68,7 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
     "userImageName": "[concat('http://',parameters('userImageStorageAccountName'),'.blob.core.windows.net/',parameters('userImageStorageContainerName'),'/',parameters('userImageVhdName'))]",
-    "osDiskVhdName": "[concat('http://',parameters('userImageStorageAccountNameTarget'),'.blob.core.windows.net/',parameters('userImageStorageContainerNameTarget'),'/',parameters('userImageVhdNameTarget'),'-osDisk.vhd')]"
+    "osDiskVhdName": "[concat('http://',parameters('userImageStorageAccountName'),'.blob.core.windows.net/vmhd/',variables('vmName'),'osDisk.vhd')]"
   },
   "resources": [
     {
