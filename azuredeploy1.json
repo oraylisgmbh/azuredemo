@@ -1,5 +1,4 @@
 {
-
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
@@ -9,16 +8,40 @@
         "description": "This is the name of the your storage account"
       }
     },
+	"userImageStorageAccountNameTarget": {
+      "type": "string",
+      "metadata": {
+        "description": "This is the name of the target storage account"
+      }
+    },
     "userImageStorageContainerName": {
       "type": "string",
       "metadata": {
         "description": "This is the name of the container in your storage account"
       }
     },
+	"userImageStorageContainerNameTarget": {
+      "type": "string",
+      "metadata": {
+        "description": "This is the name of the target container in your target storage account"
+      }
+    },
     "userImageVhdName": {
       "type": "string",
       "metadata": {
         "description": "This is the name of the your customized VHD"
+      }
+    },
+	"userImageVhdNameTarget": {
+      "type": "string",
+      "metadata": {
+        "description": "This is the name of the target VHD"
+      }
+    },
+    "dnsNameForPublicIP": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
     },
     "adminUserName": {
@@ -52,7 +75,8 @@
   },
   "variables": {
     "location": "West US",
-    "vmName": "myVM",
+    "publicIPAddressName": "myPublicIP",
+    "vmName": "parameters('userImageVhdNameTarget')",
     "virtualNetworkName": "myVNET",
     "nicName": "myVMNic",
     "addressPrefix": "10.0.0.0/16",
@@ -62,9 +86,21 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
     "userImageName": "[concat('http://',parameters('userImageStorageAccountName'),'.blob.core.windows.net/',parameters('userImageStorageContainerName'),'/',parameters('userImageVhdName'))]",
-    "osDiskVhdName": "[concat('http://',parameters('userImageStorageAccountName'),'.blob.core.windows.net/',parameters('userImageStorageContainerName'),'/',variables('vmName'),'osDisk.vhd')]"
+    "osDiskVhdName": "[concat('http://',parameters('userImageStorageAccountNameTarget'),'.blob.core.windows.net/',parameters('userImageStorageContainerNameTarget'),'/',parameters('userImageVhdNameTarget'),'_osDisk.vhd')]"
   },
   "resources": [
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('publicIPAddressName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsNameForPublicIP')]"
+        }
+      }
+    },
     {
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/virtualNetworks",
@@ -92,6 +128,7 @@
       "name": "[variables('nicName')]",
       "location": "[variables('location')]",
       "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
       "properties": {
@@ -100,6 +137,9 @@
             "name": "ipconfig1",
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              },
               "subnet": {
                 "id": "[variables('subnet1Ref')]"
               }
@@ -127,7 +167,7 @@
         },
         "storageProfile": {
           "osDisk": {
-            "name": "[concat(variables('vmName'),'-osDisk')]",
+            "name": "[concat(variables('vmName'),'_osDisk')]",
             "osType": "[parameters('osType')]",
             "caching": "ReadWrite",
             "createOption": "FromImage",
